@@ -1,0 +1,26 @@
+#!/bin/bash
+# Path to src directory of checkout
+LIBPATH=`pwd`/build/src
+cp ${LIBPATH}/**/*.dylib ${LIBPATH}/nvtt/
+# space separated list of libraries
+cd ${LIBPATH}/nvtt/
+TARGETS=*.dylib
+REPLACE="nvcore nvimage nvmath"
+for TARGET in ${TARGETS} ; do
+echo "Processing ${TARGET}"
+LIBFILE=${LIBPATH}/${TARGET}
+TARGETID=`otool -DX ${TARGET}`
+NEWTARGETID=@loader_path/${TARGET}
+install_name_tool -id ${NEWTARGETID} ${TARGET} || true
+install_name_tool -change ${LIBFILE} ${NEWTARGETID} ${TARGET} || true
+  for T2 in ${TARGETS} ; do
+        for T3 in ${REPLACE} ; do
+                echo ${LIBPATH}/${T3}/${T2} @loader_path/${T2} ${TARGET}
+                install_name_tool -change ${LIBPATH}/${T3}/${T2} @loader_path/${T2} ${TARGET} || true
+        done
+  done
+done
+# Copy the corrected files back
+cp ${LIBPATH}/nvtt/libnvmath.dylib ${LIBPATH}/nvmath/libnvmath.dylib
+cp ${LIBPATH}/nvtt/libnvimage.dylib ${LIBPATH}/nvimage/libnvimage.dylib
+cp ${LIBPATH}/nvtt/libnvcore.dylib ${LIBPATH}/nvcore/libnvcore.dylib
