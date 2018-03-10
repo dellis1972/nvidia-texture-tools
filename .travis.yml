@@ -11,3 +11,8 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd build ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" -DNVTT_SHARED="TRUE"  .. ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then make ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd .. ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./fixloaderpathsosx ; fi
+- nuget restore project/vc12/Nvidia.TextureTools.UnitTests/Nvidia.TextureTools.UnitTests.csproj -PackagesDirectory project/vc12/packages
+- msbuild /t:Build project/vc12/Nvidia.TextureTools.UnitTests/Nvidia.TextureTools.UnitTests.csproj
+- mono project/vc12/packages/NUnit.ConsoleRunner.3.8.0/tools/nunit3-console.exe project/vc12/Nvidia.TextureTools.UnitTests/bin/Debug/Nvidia.TextureTools.UnitTests.dll
